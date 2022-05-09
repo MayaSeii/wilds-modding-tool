@@ -280,16 +280,15 @@ public class PlayerSkinController implements Initializable
         errorPane.setVisible(false);
     }
 
-    public void downloadTemplate() throws URISyntaxException, IOException
+    public void downloadTemplate() throws IOException
     {
         String selectedDirPath = getUserChosenDirectory("PlayerSkin.SaveTemplate");
         if (selectedDirPath == null) return;
 
         Path to = Paths.get(selectedDirPath + "/Wilds_PlayerSkinTemplate.zip");
-        Path from = Paths.get(Objects.requireNonNull(getClass().getResource("misc/Wilds_PlayerSkinTemplate.zip")).toURI());
+        InputStream from = getClass().getResourceAsStream("misc/Wilds_PlayerSkinTemplate.zip");
 
-        // Copies the file to the new directory.
-        Files.copy(from, to, StandardCopyOption.REPLACE_EXISTING);
+        Files.copy(Objects.requireNonNull(from), to, StandardCopyOption.REPLACE_EXISTING);
 
         displayTemplateSuccessPopup(selectedDirPath);
     }
