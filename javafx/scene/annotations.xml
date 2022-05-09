@@ -1,0 +1,8 @@
+<root>
+    <item name='javafx.scene.Node java.lang.String getId()'>
+        <annotation name='org.jetbrains.annotations.NonNls'/>
+    </item>
+    <item name='javafx.scene.Node void setId(java.lang.String)'>
+        <annotation name='org.jetbrains.annotations.NonNls'/>
+    </item>
+</root>

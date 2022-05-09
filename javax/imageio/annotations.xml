@@ -1,0 +1,8 @@
+<root>
+    <item name='javax.imageio.ImageIO boolean write(java.awt.image.RenderedImage, java.lang.String, java.io.File)'>
+        <annotation name='org.jetbrains.annotations.NonNls'/>
+    </item>
+    <item name='javax.imageio.ImageIO boolean write(java.awt.image.RenderedImage, java.lang.String, java.io.OutputStream)'>
+        <annotation name='org.jetbrains.annotations.NonNls'/>
+    </item>
+</root>

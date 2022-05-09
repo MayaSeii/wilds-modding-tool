@@ -1,0 +1,5 @@
+<root>
+    <item name='javafx.stage.FileChooser.ExtensionFilter ExtensionFilter(java.lang.String, java.lang.String...)'>
+        <annotation name='org.jetbrains.annotations.NonNls'/>
+    </item>
+</root>
