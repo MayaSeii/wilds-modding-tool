@@ -10,6 +10,7 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.scene.media.Media;
 import javafx.util.Duration;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -24,7 +25,7 @@ public class Application extends javafx.application.Application
     public static Locale locale;
 
     @Override
-    public void start(Stage stage) throws IOException
+    public void start(@NotNull Stage stage) throws IOException
     {
         // Resolves the locale.
         locale = new Locale("en");
@@ -67,7 +68,7 @@ public class Application extends javafx.application.Application
         Media media = null;
 
         // Loads the background music track.
-        try { media = new Media(Objects.requireNonNull(getClass().getResource("audio/azaleaBG.mp3")).toURI().toString()); }
+        try { media = new Media(Objects.requireNonNull(getClass().getResource("audio/BG_AzaleaTown.wav")).toURI().toString()); }
         catch (URISyntaxException e) { e.printStackTrace(); }
 
         assert media != null;
@@ -75,13 +76,16 @@ public class Application extends javafx.application.Application
         mediaPlayer.setVolume(0.2);
 
         // Enables looping.
-        mediaPlayer.setOnEndOfMedia(() -> {
-            mediaPlayer.seek(Duration.ZERO);
+        mediaPlayer.setOnEndOfMedia(() ->
+        {
+            mediaPlayer.seek(Duration.seconds(4.414));
             mediaPlayer.play();
         });
+
+        mediaPlayer.setCycleCount(Integer.MAX_VALUE);
     }
 
-    private void startMediaPlayer(Scene scene)
+    private void startMediaPlayer(@NotNull Scene scene)
     {
         // Plays the background track.
         mediaPlayer.setAutoPlay(true);

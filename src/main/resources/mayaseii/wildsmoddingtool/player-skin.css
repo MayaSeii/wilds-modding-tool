@@ -22,7 +22,7 @@
 
 }
 
-#dimensions-dialog {
+#dimensions-dialog, #preview-pane {
 
     -fx-background-color: rgba(0, 0, 0, 0.5);
     -fx-z-index: 15;

@@ -5,6 +5,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -19,7 +20,11 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.input.InputEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -28,17 +33,19 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.imageio.ImageIO;
+import javax.imageio.stream.FileImageOutputStream;
+import javax.imageio.stream.ImageOutputStream;
 import java.awt.*;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.Objects;
-import java.util.ResourceBundle;
+import java.util.*;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -47,8 +54,9 @@ public class PlayerSkinController implements Initializable
 {
     @FXML private SplitPane splitPane;
     @FXML private AnchorPane leftPane;
-    @FXML private AnchorPane errorPane;
     @FXML private AnchorPane rightPane;
+    @FXML private AnchorPane errorPane;
+    @FXML private AnchorPane previewPane;
     @FXML private TextField nameField;
     @FXML private TextField authorField;
     @FXML private Label nameLabel;
@@ -56,6 +64,7 @@ public class PlayerSkinController implements Initializable
     @FXML private ImageView sleepingView;
     @FXML private ImageView frontView;
     @FXML private ImageView backView;
+    @FXML private ImageView animWalkView;
 
     private ResourceBundle _bundle;
 
@@ -72,6 +81,7 @@ public class PlayerSkinController implements Initializable
         authorField.setText(bundle.getString("PlayerSkin.Author"));
 
         initialiseErrorPane();
+        hidePreviewPane();
 
         _bundle = bundle;
     }
@@ -341,15 +351,15 @@ public class PlayerSkinController implements Initializable
         ZipOutputStream outputStream = new ZipOutputStream(new FileOutputStream(zip));
 
         // Adds all sprites to the zip folder.
-        addToZip("walking.png", walkingSprite, outputStream);
-        addToZip("running.png", runningSprite, outputStream);
-        addToZip("sitting.png", sittingSprite, outputStream);
-        addToZip("fishing.png", fishingSprite, outputStream);
-        addToZip("front.png", frontSprite, outputStream);
-        addToZip("back.png", backSprite, outputStream);
-        addToZip("sleepingbag.png", sleepingSprite, outputStream);
+        addSpriteToZip("walking.png", walkingSprite, outputStream);
+        addSpriteToZip("running.png", runningSprite, outputStream);
+        addSpriteToZip("sitting.png", sittingSprite, outputStream);
+        addSpriteToZip("fishing.png", fishingSprite, outputStream);
+        addSpriteToZip("front.png", frontSprite, outputStream);
+        addSpriteToZip("back.png", backSprite, outputStream);
+        addSpriteToZip("sleepingbag.png", sleepingSprite, outputStream);
 
-        saveCreditsFile(outputStream);
+        addCreditsFileToZip(outputStream);
         outputStream.close();
 
         displayModDownloadSuccessPopup(selectedDirPath);
@@ -365,7 +375,7 @@ public class PlayerSkinController implements Initializable
         displayInfoPopup(popupText);
     }
 
-    private void saveCreditsFile(@NotNull ZipOutputStream outputStream) throws IOException
+    private void addCreditsFileToZip(@NotNull ZipOutputStream outputStream) throws IOException
     {
         // Gets the bytes needed for the credits file.
         byte @NonNls [] data = ("Mod created by " + authorField.getText() + ".\nDo not remove this file from the mod folder.").getBytes();
@@ -377,7 +387,7 @@ public class PlayerSkinController implements Initializable
         outputStream.closeEntry();
     }
 
-    private void addToZip(String name, BufferedImage walkingSprite, @NotNull ZipOutputStream outputStream) throws IOException
+    private void addSpriteToZip(String name, BufferedImage walkingSprite, @NotNull ZipOutputStream outputStream) throws IOException
     {
         ZipEntry entry = new ZipEntry(name);
         outputStream.putNextEntry(entry);
@@ -462,5 +472,116 @@ public class PlayerSkinController implements Initializable
         parameters.setFill(Color.TRANSPARENT);
 
         return imageView.snapshot(parameters, null);
+    }
+
+    public void showPreviewPane() throws Exception
+    {
+        int delay = 200;
+        int runDelay = (int) (delay / 1.5);
+
+        int[] delays = new int[] { delay, delay, delay, delay };
+        int[] runDelays = new int[] { runDelay, runDelay, runDelay, runDelay };
+
+        createDirectionGIF(delays, "walking", "front", "anim-walk-front.gif", true);
+        createDirectionGIF(delays, "walking", "back", "anim-walk-back.gif", true);
+        createDirectionGIF(delays, "walking", "left", "anim-walk-left.gif", false);
+        createDirectionGIF(delays, "walking", "right", "anim-walk-right.gif", false);
+
+        createDirectionGIF(runDelays, "running", "front", "anim-run-front.gif", true);
+        createDirectionGIF(runDelays, "running", "back", "anim-run-back.gif", true);
+        createDirectionGIF(runDelays, "running", "left", "anim-run-left.gif", false);
+        createDirectionGIF(runDelays, "running", "right", "anim-run-right.gif", false);
+
+        Map<Integer, Integer> colourMap = new HashMap<>();
+
+        for (Node node : previewPane.getChildren())
+        {
+            if (node instanceof ImageView view)
+            {
+                if (view.getId() != null)
+                {
+                    Image image = new Image(new File(view.getId() + ".gif").toURI().toString());
+                    view.setImage(image);
+                }
+            }
+        }
+
+        for (Node node: rightPane.getChildren())
+        {
+            if (node instanceof ImageView view && view.getId() != null)
+            {
+                if (view.getImage() == null) continue;
+
+                for (int x = 0; x < view.getImage().getWidth(); x++)
+                {
+                    for (int y = 0; y < view.getImage().getHeight(); y++)
+                    {
+                        int rgba = SwingFXUtils.fromFXImage(view.getImage(), null).getRGB(x, y);
+                        Integer colourCount = colourMap.get(rgba);
+                        colourCount = colourCount == null ? 1 : colourCount + 1;
+                        colourMap.put(rgba, colourCount);
+                    }
+                }
+            }
+        }
+
+        for (Integer colour : colourMap.keySet())
+        {
+            Rectangle testPane = new Rectangle();
+            testPane.setWidth(32);
+            testPane.setHeight(32);
+            testPane.setLayoutX(new Random().nextInt(1000));
+            testPane.setLayoutY(new Random().nextInt(600));
+            String hexColor = String.format("#%06X", (0xFFFFFF & colour));
+            Color newColor = Color.valueOf(hexColor);
+
+            testPane.setFill(newColor);
+            testPane.setVisible(true);
+
+            previewPane.getChildren().add(testPane);
+
+        }
+        previewPane.setVisible(true);
+    }
+
+    private @NonNls void createDirectionGIF(int[] delays, String action, String direction, String file, boolean mirror) throws Exception
+    {
+        BufferedImage[] sprites = new BufferedImage[mirror ? 4 : 2];
+        int i = 0;
+
+        for (Node node : rightPane.getChildren())
+        {
+            if (node instanceof ImageView view)
+            {
+                if (view.getId() != null && view.getId().contains(action) && view.getId().contains(direction))
+                {
+                    sprites[i] = SwingFXUtils.fromFXImage(view.getImage(), null);
+                    if (mirror)
+                    {
+                        BufferedImage initialImage = SwingFXUtils.fromFXImage(view.getImage(), null);
+
+                        AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
+                        tx.translate(-initialImage.getWidth(), 0);
+
+                        AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
+
+                        initialImage = op.filter(initialImage, null);
+
+                        sprites[i + 2] = initialImage;
+                    }
+                    i++;
+                }
+            }
+        }
+
+        AnimatedGIFWriter writer = new AnimatedGIFWriter(true);
+        OutputStream os = new FileOutputStream(file);
+
+        writer.writeAnimatedGIF(sprites, delays, os);
+    }
+
+    public void hidePreviewPane()
+    {
+        previewPane.setVisible(false);
     }
 }
