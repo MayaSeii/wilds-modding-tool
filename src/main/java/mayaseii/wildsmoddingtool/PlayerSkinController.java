@@ -57,13 +57,14 @@ public class PlayerSkinController implements Initializable
     @FXML private ImageView frontView;
     @FXML private ImageView backView;
     @FXML private ImageView toPicker;
-    @FXML private ImageView fromPicker;
     @FXML private ImageView originPane;
     @FXML private Group colourGroup;
     private ResourceBundle _bundle;
 
     private static java.awt.Color _toColour = new java.awt.Color(248, 56, 8);
-    private static java.awt.Color _fromColour;
+    private static final ArrayList<java.awt.Color> _fromColours = new ArrayList<>();
+
+    private static boolean _neverOpened = true;
 
     public void initialize(URL location, @NotNull ResourceBundle bundle)
     {
@@ -221,6 +222,8 @@ public class PlayerSkinController implements Initializable
 
         // Displays the image on the corresponding file-name image view.
         ImageView fileView = (ImageView) imageView.getScene().lookup('#' + imageView.getId() + "-1");
+        if (fileView == null) return;
+
         fileView.setImage(image);
         fileView.setOpacity(1);
     }
@@ -357,6 +360,8 @@ public class PlayerSkinController implements Initializable
         addSpriteToZip("sleepingbag.png", sleepingSprite, outputStream);
 
         addCreditsFileToZip(outputStream);
+        addPaletteFileToZip(outputStream);
+
         outputStream.close();
 
         displayModDownloadSuccessPopup(selectedDirPath);
@@ -379,6 +384,23 @@ public class PlayerSkinController implements Initializable
 
         // Creates and saves the credits file.
         ZipEntry entry = new ZipEntry("credits.txt");
+        outputStream.putNextEntry(entry);
+        outputStream.write(data, 0, data.length);
+        outputStream.closeEntry();
+    }
+
+    private void addPaletteFileToZip(@NotNull @NonNls ZipOutputStream outputStream) throws IOException
+    {
+        // Ignores this file if no colours were chosen.
+        if (_fromColours.size() == 0) return;
+
+        // Gets the bytes needed for the palette file.
+        @NonNls StringBuilder toConvert = new StringBuilder();
+        for (java.awt.Color colour : _fromColours) toConvert.append("\tRGB ").append(colour.getRed()).append(", ").append(colour.getGreen()).append(", ").append(colour.getBlue()).append("\n");
+        byte @NonNls [] data = toConvert.toString().getBytes();
+
+        // Creates and saves the palette file.
+        ZipEntry entry = new ZipEntry("var.pal");
         outputStream.putNextEntry(entry);
         outputStream.write(data, 0, data.length);
         outputStream.closeEntry();
@@ -473,27 +495,19 @@ public class PlayerSkinController implements Initializable
 
     public void showPreviewPane() throws Exception
     {
-        createPreviewGIFs();
-        loadGIFsIntoViews();
-        loadPNGViews();
+        if (_neverOpened)
+        {
+            createPreviewGIFs();
+            loadGIFsIntoViews();
+            changePNGPaneColour();
 
-        Map<Integer, Integer> colourMap = getSpriteColourMap();
-        createPalettePanel(colourMap);
+            Map<Integer, Integer> colourMap = getSpriteColourMap();
+            createPalettePanel(colourMap);
+
+            _neverOpened = false;
+        }
 
         previewPane.setVisible(true);
-    }
-
-    private void loadPNGViews()
-    {
-        for (Node node : previewPane.getChildren())
-        {
-            if (node instanceof ImageView view && view.getId() != null && view.getId().contains("-2") && !view.getId().contains("pane"))
-            {
-                String url = "img/player-skin/" + view.getId().replace("-2", "") + ".png";
-                Image image = new Image(Objects.requireNonNull(getClass().getResource(url)).toExternalForm(), view.getFitWidth(), view.getFitHeight(), true, false);
-                view.setImage(image);
-            }
-        }
     }
 
     private void createPalettePanel(@NotNull Map<Integer, Integer> colourMap)
@@ -679,23 +693,49 @@ public class PlayerSkinController implements Initializable
     public void palettePanelClicked(@NotNull MouseEvent e)
     {
         Rectangle button = (Rectangle) e.getSource();
-        _fromColour = fxToAWTColor((Color) button.getFill());
+        _fromColours.add(fxToAWTColor((Color) button.getFill()));
 
-        if (!fromPicker.isVisible())
-        {
-            fromPicker.setVisible(true);
-            fromPicker.toFront();
-        }
+        createColourSelector(new Vector2((int) button.getLayoutX(), (int) button.getLayoutY()), fxToAWTColor((Color) button.getFill()));
 
-        fromPicker.setLayoutX(button.getLayoutX());
-        fromPicker.setLayoutY(button.getLayoutY());
+        changeColour();
+    }
+
+    private void createColourSelector(@NotNull Vector2 position, java.awt.@NotNull Color colour)
+    {
+        ImageView view = new ImageView();
+        view.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream("img/player-skin/frame-selection.png"))));
+
+        view.setLayoutX(position.x);
+        view.setLayoutY(position.y);
+
+        view.setId(String.valueOf(colour.getRGB()));
+        view.getStyleClass().add("colour-pane");
+
+        EventHandler<MouseEvent> eventHandler = this::removeFromSelectedColours;
+        view.setOnMouseClicked(eventHandler);
+
+        colourGroup.getChildren().add(view);
+
+        view.toFront();
+    }
+
+    private void removeFromSelectedColours(@NotNull MouseEvent e)
+    {
+        System.out.println("TEST");
+
+        ImageView view = (ImageView) e.getSource();
+        int code = Integer.parseInt(view.getId());
+        java.awt.Color toRemove = new java.awt.Color(code);
+
+        _fromColours.remove(toRemove);
+        colourGroup.getChildren().remove(view);
 
         changeColour();
     }
 
     private void changeColour()
     {
-        ArrayList<Image> originalImages = changeTemporaryPaneColour(_fromColour, _toColour);
+        ArrayList<Image> originalImages = changeTemporaryPaneColour(_toColour);
 
         try
         {
@@ -724,7 +764,7 @@ public class PlayerSkinController implements Initializable
         }
     }
 
-    private @NotNull ArrayList<Image> changeTemporaryPaneColour(java.awt.Color from, java.awt.Color to)
+    private @NotNull ArrayList<Image> changeTemporaryPaneColour(java.awt.Color to)
     {
         ArrayList<Image> oldImageList = new ArrayList<>();
 
@@ -735,11 +775,15 @@ public class PlayerSkinController implements Initializable
                 Image oldImage = view.getImage();
                 oldImageList.add(oldImage);
 
-                BufferedImage bufferedImage = SwingFXUtils.fromFXImage(oldImage, null);
-                BufferedImageOp lookup = new LookupOp(new ColorMapper(from, to), null);
-                BufferedImage convertedImage = lookup.filter(bufferedImage, null);
+                BufferedImage convertedImage = SwingFXUtils.fromFXImage(oldImage, null);
 
-                view.setImage(SwingFXUtils.toFXImage(convertedImage, null));
+                for (java.awt.Color fromColour : _fromColours)
+                {
+                    BufferedImageOp lookup = new LookupOp(new ColorMapper(fromColour, to), null);
+                    convertedImage = lookup.filter(convertedImage, null);
+                }
+
+                if (convertedImage != null) view.setImage(SwingFXUtils.toFXImage(convertedImage, null));
             }
         }
 
@@ -768,7 +812,7 @@ public class PlayerSkinController implements Initializable
 
         _toColour = new java.awt.Color((float) fxColour.getRed(), (float) fxColour.getGreen(), (float) fxColour.getBlue(), (float) fxColour.getOpacity());
 
-        if (_fromColour == null) return;
+        if (_fromColours.size() == 0) return;
         changeColour();
     }
 

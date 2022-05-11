@@ -68,17 +68,17 @@ public class Application extends javafx.application.Application
         Media media = null;
 
         // Loads the background music track.
-        try { media = new Media(Objects.requireNonNull(getClass().getResource("audio/BG_AzaleaTown.wav")).toURI().toString()); }
+        try { media = new Media(Objects.requireNonNull(getClass().getResource("audio/BG_VioletCity.wav")).toURI().toString()); }
         catch (URISyntaxException e) { e.printStackTrace(); }
 
         assert media != null;
         mediaPlayer = new MediaPlayer(media);
-        mediaPlayer.setVolume(0.2);
+        mediaPlayer.setVolume(0.3);
 
         // Enables looping.
         mediaPlayer.setOnEndOfMedia(() ->
         {
-            mediaPlayer.seek(Duration.seconds(4.414));
+            mediaPlayer.seek(Duration.seconds(2.2));
             mediaPlayer.play();
         });
 

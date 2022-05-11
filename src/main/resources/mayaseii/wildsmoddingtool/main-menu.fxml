@@ -11,7 +11,7 @@
 <?import javafx.scene.text.Font?>
 
 
-<AnchorPane id="container" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="511.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mayaseii.wildsmoddingtool.Controller">
+<AnchorPane id="container" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="511.0" prefWidth="700.0" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="mayaseii.wildsmoddingtool.Controller">
    <children>
       <Button id="btn-skin" fx:id="btnPlayer" layoutX="360.0" layoutY="368.0" mnemonicParsing="false" onAction="#playerSkinScene" prefHeight="80.0" prefWidth="320.0" text="%MainMenu.PlayerSkin" />
       <Button id="btn-texture" fx:id="btnTexture" layoutX="20.0" layoutY="265.0" mnemonicParsing="false" prefHeight="80.0" prefWidth="320.0" text="%MainMenu.TexturePack" textAlignment="RIGHT" />
