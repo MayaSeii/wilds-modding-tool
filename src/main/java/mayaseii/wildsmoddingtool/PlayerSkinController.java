@@ -2,17 +2,17 @@ package mayaseii.wildsmoddingtool;
 
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.SnapshotParameters;
-import javafx.scene.control.*;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelReader;
@@ -20,25 +20,20 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.input.InputEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.CornerRadii;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.imageio.ImageIO;
-import javax.imageio.stream.FileImageOutputStream;
-import javax.imageio.stream.ImageOutputStream;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
-import java.awt.image.AffineTransformOp;
-import java.awt.image.BufferedImage;
+import java.awt.image.*;
 import java.io.*;
 import java.net.URL;
 import java.nio.file.Files;
@@ -64,9 +59,10 @@ public class PlayerSkinController implements Initializable
     @FXML private ImageView sleepingView;
     @FXML private ImageView frontView;
     @FXML private ImageView backView;
-    @FXML private ImageView animWalkView;
 
     private ResourceBundle _bundle;
+
+    private static java.awt.Color _replacementColour;
 
     public void initialize(URL location, @NotNull ResourceBundle bundle)
     {
@@ -476,103 +472,101 @@ public class PlayerSkinController implements Initializable
 
     public void showPreviewPane() throws Exception
     {
+        createPreviewGIFs();
+        loadGIFsIntoViews();
+
+        Map<Integer, Integer> colourMap = getSpriteColourMap();
+        createPalettePanel(colourMap);
+
+        previewPane.setVisible(true);
+    }
+
+    private void createPalettePanel(@NotNull Map<Integer, Integer> colourMap)
+    {
+        for (Integer colour : colourMap.keySet())
+        {
+            Rectangle palettePane = new Rectangle();
+
+            palettePane.setWidth(32);
+            palettePane.setHeight(32);
+            palettePane.setLayoutX(new Random().nextInt(1000));
+            palettePane.setLayoutY(new Random().nextInt(600));
+
+            Color newColor = Color.valueOf(String.format("#%06X", (0xFFFFFF & colour)));
+            palettePane.setFill(newColor);
+
+            // Adds the mouse click event handler.
+            EventHandler<MouseEvent> eventHandler = this::changeColour;
+            palettePane.addEventHandler(MouseEvent.MOUSE_CLICKED, eventHandler);
+
+            previewPane.getChildren().add(palettePane);
+
+        }
+    }
+
+    private void loadGIFsIntoViews()
+    {
+        for (Node node : previewPane.getChildren())
+        {
+            if (node instanceof ImageView view && view.getId() != null)
+            {
+                Image image = new Image(new File(view.getId() + ".gif").toURI().toString());
+                view.setImage(image);
+            }
+        }
+    }
+
+    private @NotNull Map<Integer, Integer> getSpriteColourMap()
+    {
+        Map<Integer, Integer> colourMap = new HashMap<>();
+
+        // Adds all pixel colours to the colour map.
+        for (Node node: rightPane.getChildren())
+        {
+            if (node instanceof ImageView view && view.getId() != null && view.getImage() != null)
+            {
+                int[] data = ( (DataBufferInt) SwingFXUtils.fromFXImage(view.getImage(), null).getRaster().getDataBuffer() ).getData();
+                for (int datum : data) putColourInMap(colourMap, datum);
+            }
+        }
+
+        return colourMap;
+    }
+
+    private void putColourInMap(@NotNull Map<Integer, Integer> colourMap, int datum)
+    {
+        int rgba = new java.awt.Color(datum).getRGB();
+
+        Integer colourCount = colourMap.get(rgba);
+        colourCount = colourCount == null ? 1 : colourCount + 1;
+        colourMap.put(rgba, colourCount);
+    }
+
+    private void createPreviewGIFs() throws Exception
+    {
         int delay = 200;
         int runDelay = (int) (delay / 1.5);
 
         int[] delays = new int[] { delay, delay, delay, delay };
         int[] runDelays = new int[] { runDelay, runDelay, runDelay, runDelay };
 
+        // Walking GIFs.
         createDirectionGIF(delays, "walking", "front", "anim-walk-front.gif", true);
         createDirectionGIF(delays, "walking", "back", "anim-walk-back.gif", true);
         createDirectionGIF(delays, "walking", "left", "anim-walk-left.gif", false);
         createDirectionGIF(delays, "walking", "right", "anim-walk-right.gif", false);
 
+        // Running GIFs.
         createDirectionGIF(runDelays, "running", "front", "anim-run-front.gif", true);
         createDirectionGIF(runDelays, "running", "back", "anim-run-back.gif", true);
         createDirectionGIF(runDelays, "running", "left", "anim-run-left.gif", false);
         createDirectionGIF(runDelays, "running", "right", "anim-run-right.gif", false);
-
-        Map<Integer, Integer> colourMap = new HashMap<>();
-
-        for (Node node : previewPane.getChildren())
-        {
-            if (node instanceof ImageView view)
-            {
-                if (view.getId() != null)
-                {
-                    Image image = new Image(new File(view.getId() + ".gif").toURI().toString());
-                    view.setImage(image);
-                }
-            }
-        }
-
-        for (Node node: rightPane.getChildren())
-        {
-            if (node instanceof ImageView view && view.getId() != null)
-            {
-                if (view.getImage() == null) continue;
-
-                for (int x = 0; x < view.getImage().getWidth(); x++)
-                {
-                    for (int y = 0; y < view.getImage().getHeight(); y++)
-                    {
-                        int rgba = SwingFXUtils.fromFXImage(view.getImage(), null).getRGB(x, y);
-                        Integer colourCount = colourMap.get(rgba);
-                        colourCount = colourCount == null ? 1 : colourCount + 1;
-                        colourMap.put(rgba, colourCount);
-                    }
-                }
-            }
-        }
-
-        for (Integer colour : colourMap.keySet())
-        {
-            Rectangle testPane = new Rectangle();
-            testPane.setWidth(32);
-            testPane.setHeight(32);
-            testPane.setLayoutX(new Random().nextInt(1000));
-            testPane.setLayoutY(new Random().nextInt(600));
-            String hexColor = String.format("#%06X", (0xFFFFFF & colour));
-            Color newColor = Color.valueOf(hexColor);
-
-            testPane.setFill(newColor);
-            testPane.setVisible(true);
-
-            previewPane.getChildren().add(testPane);
-
-        }
-        previewPane.setVisible(true);
     }
 
     private @NonNls void createDirectionGIF(int[] delays, String action, String direction, String file, boolean mirror) throws Exception
     {
         BufferedImage[] sprites = new BufferedImage[mirror ? 4 : 2];
-        int i = 0;
-
-        for (Node node : rightPane.getChildren())
-        {
-            if (node instanceof ImageView view)
-            {
-                if (view.getId() != null && view.getId().contains(action) && view.getId().contains(direction))
-                {
-                    sprites[i] = SwingFXUtils.fromFXImage(view.getImage(), null);
-                    if (mirror)
-                    {
-                        BufferedImage initialImage = SwingFXUtils.fromFXImage(view.getImage(), null);
-
-                        AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
-                        tx.translate(-initialImage.getWidth(), 0);
-
-                        AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
-
-                        initialImage = op.filter(initialImage, null);
-
-                        sprites[i + 2] = initialImage;
-                    }
-                    i++;
-                }
-            }
-        }
+        populateSpriteArray(action, direction, mirror, sprites);
 
         AnimatedGIFWriter writer = new AnimatedGIFWriter(true);
         OutputStream os = new FileOutputStream(file);
@@ -580,8 +574,96 @@ public class PlayerSkinController implements Initializable
         writer.writeAnimatedGIF(sprites, delays, os);
     }
 
+    private void populateSpriteArray(String action, String direction, boolean mirror, BufferedImage[] sprites)
+    {
+        int i = 0;
+
+        for (Node node : rightPane.getChildren())
+        {
+            if (node instanceof ImageView view && view.getId() != null && view.getId().contains(action) && view.getId().contains(direction))
+            {
+                BufferedImage sprite = SwingFXUtils.fromFXImage(view.getImage(), null);
+
+                sprites[i] = sprite;
+
+                if (mirror)
+                {
+                    sprite = mirrorImage(sprite);
+                    sprites[i + 2] = sprite;
+                }
+
+                i++;
+            }
+        }
+    }
+
+    private BufferedImage mirrorImage(@NotNull BufferedImage img)
+    {
+        AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
+        tx.translate(-img.getWidth(), 0);
+
+        AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
+
+        return op.filter(img, null);
+    }
+
+    public void changeColour(@NotNull MouseEvent e)
+    {
+        Rectangle button = (Rectangle) e.getSource();
+
+        java.awt.Color from = fxToAWTColor((Color) button.getFill());
+        java.awt.Color to = _replacementColour;
+
+        changeTemporaryPaneColour(from, to);
+
+        try
+        {
+            createPreviewGIFs();
+            loadGIFsIntoViews();
+        }
+        catch (Exception ex)
+        {
+            throw new RuntimeException(ex);
+        }
+        finally
+        {
+            changeTemporaryPaneColour(to, from);
+        }
+    }
+
+    private void changeTemporaryPaneColour(java.awt.Color from, java.awt.Color to)
+    {
+        for (Node node : rightPane.getChildren())
+        {
+            if (node instanceof ImageView view && view.getId() != null)
+            {
+                Image newImage = view.getImage();
+
+                BufferedImage bufferedImage = SwingFXUtils.fromFXImage(newImage, null);
+                BufferedImageOp lookup = new LookupOp(new ColorMapper(from, to), null);
+                BufferedImage convertedImage = lookup.filter(bufferedImage, null);
+
+                view.setImage(SwingFXUtils.toFXImage(convertedImage, null));
+            }
+        }
+    }
+
+    public void setReplacementColour(@NotNull MouseEvent e)
+    {
+        Rectangle colourRect = (Rectangle) e.getSource();
+        Color fxColour = (Color) colourRect.getFill();
+
+        _replacementColour = new java.awt.Color((float) fxColour.getRed(), (float) fxColour.getGreen(), (float) fxColour.getBlue(), (float) fxColour.getOpacity());
+    }
+
     public void hidePreviewPane()
     {
         previewPane.setVisible(false);
+    }
+
+    @Contract("_ -> new")
+    private java.awt.@NotNull Color fxToAWTColor(@NotNull Color fxColour)
+    {
+        return new java.awt.Color((float) fxColour.getRed(), (float) fxColour.getGreen(), (float) fxColour.getBlue(), (float) fxColour.getOpacity());
     }
 }
