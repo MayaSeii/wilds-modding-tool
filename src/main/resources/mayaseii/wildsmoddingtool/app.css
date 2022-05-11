@@ -1,7 +1,3 @@
-@font-face {
-    src: url("PokeWilds-Regular.ttf");
-}
-
 .root {
 
     -fx-font-family: "PokeWilds";

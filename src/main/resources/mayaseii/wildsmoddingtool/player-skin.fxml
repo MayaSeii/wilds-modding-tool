@@ -306,7 +306,7 @@
          <ImageView id="fishing-side" fitHeight="32.0" fitWidth="48.0" layoutX="526.0" layoutY="375.0" onMouseClicked="#uploadImage" opacity="0.5" pickOnBounds="true" preserveRatio="true" smooth="false" styleClass="view-clickable">
             <Image url="@img/player-skin/fishing-side.png" />
          </ImageView>
-         <ImageView fx:id="sleepingView" fitHeight="32.0" fitWidth="48.0" layoutX="653.0" layoutY="375.0" onMouseClicked="#uploadImage" opacity="0.5" pickOnBounds="true" preserveRatio="true" smooth="false" styleClass="view-clickable">
+         <ImageView id="sleeping" fx:id="sleepingView" fitHeight="32.0" fitWidth="48.0" layoutX="653.0" layoutY="375.0" onMouseClicked="#uploadImage" opacity="0.5" pickOnBounds="true" preserveRatio="true" smooth="false" styleClass="view-clickable">
             <Image url="@img/player-skin/sleeping.png" />
          </ImageView>
          <ImageView layoutX="189.0" layoutY="478.0" pickOnBounds="true" preserveRatio="true">
@@ -315,10 +315,10 @@
          <ImageView layoutX="29.0" layoutY="479.0" pickOnBounds="true" preserveRatio="true">
             <Image url="@img/player-skin/frame-xlarge.png" />
          </ImageView>
-         <ImageView fx:id="frontView" fitHeight="112.0" fitWidth="112.0" layoutX="45.0" layoutY="495.0" onMouseClicked="#uploadImage" opacity="0.5" pickOnBounds="true" preserveRatio="true" smooth="false" styleClass="view-clickable">
+         <ImageView id="front" fx:id="frontView" fitHeight="112.0" fitWidth="112.0" layoutX="45.0" layoutY="495.0" onMouseClicked="#uploadImage" opacity="0.5" pickOnBounds="true" preserveRatio="true" smooth="false" styleClass="view-clickable">
             <Image url="@img/player-skin/front.png" />
          </ImageView>
-         <ImageView fx:id="backView" fitHeight="96.0" fitWidth="96.0" layoutX="213.0" layoutY="502.0" onMouseClicked="#uploadImage" opacity="0.5" pickOnBounds="true" preserveRatio="true" smooth="false" styleClass="view-clickable">
+         <ImageView id="back" fx:id="backView" fitHeight="96.0" fitWidth="96.0" layoutX="213.0" layoutY="502.0" onMouseClicked="#uploadImage" opacity="0.5" pickOnBounds="true" preserveRatio="true" smooth="false" styleClass="view-clickable">
             <Image url="@img/player-skin/back.png" />
          </ImageView>
          <Label layoutX="29.0" layoutY="436.0" text="%PlayerSkin.Front">
@@ -369,100 +369,163 @@
       </Label>
    </AnchorPane>
    <AnchorPane id="preview-pane" fx:id="previewPane" prefHeight="692.0" prefWidth="1083.0">
-      <children>
-         <ImageView layoutX="54.0" layoutY="35.0" pickOnBounds="true" preserveRatio="true">
-            <image>
-               <Image url="@img/player-skin/preview-bg.png" />
-            </image>
+      <ImageView layoutX="203.0" layoutY="48.0" pickOnBounds="true">
+         <Image url="@img/player-skin/preview-bg.png" />
+      </ImageView>
+      <ImageView id="anim-walk-front" fitHeight="32.0" fitWidth="32.0" layoutX="297.0" layoutY="116.0" pickOnBounds="true" preserveRatio="true">
+         <Image url="@img/player-skin/run-front.png" />
+      </ImageView>
+      <ImageView id="anim-walk-left" fitHeight="32.0" fitWidth="32.0" layoutX="329.0" layoutY="116.0" pickOnBounds="true" preserveRatio="true">
+         <Image url="@img/player-skin/run-front.png" />
+      </ImageView>
+      <ImageView id="anim-walk-right" fitHeight="32.0" fitWidth="32.0" layoutX="361.0" layoutY="116.0" pickOnBounds="true" preserveRatio="true">
+         <Image url="@img/player-skin/run-front.png" />
+      </ImageView>
+      <ImageView id="anim-walk-back" fitHeight="32.0" fitWidth="32.0" layoutX="393.0" layoutY="116.0" pickOnBounds="true" preserveRatio="true">
+         <Image url="@img/player-skin/run-front.png" />
+      </ImageView>
+      <ImageView id="anim-run-front" fitHeight="32.0" fitWidth="32.0" layoutX="297.0" layoutY="216.0" pickOnBounds="true" preserveRatio="true">
+         <Image url="@img/player-skin/run-front.png" />
+      </ImageView>
+      <ImageView id="anim-run-left" fitHeight="32.0" fitWidth="32.0" layoutX="393.0" layoutY="216.0" pickOnBounds="true" preserveRatio="true">
+         <Image url="@img/player-skin/run-front.png" />
+      </ImageView>
+      <ImageView id="anim-run-right" fitHeight="32.0" fitWidth="32.0" layoutX="329.0" layoutY="216.0" pickOnBounds="true" preserveRatio="true">
+         <Image url="@img/player-skin/run-front.png" />
+      </ImageView>
+      <ImageView id="anim-run-back" fitHeight="32.0" fitWidth="32.0" layoutX="361.0" layoutY="216.0" pickOnBounds="true" preserveRatio="true">
+         <Image url="@img/player-skin/run-front.png" />
+      </ImageView>
+      <Label layoutX="297.0" layoutY="74.0" text="%PlayerSkin.Walking">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </Label>
+      <Label layoutX="297.0" layoutY="174.0" text="%PlayerSkin.Running">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </Label>
+      <Group layoutX="561.0" layoutY="447.0">
+         <ImageView pickOnBounds="true" preserveRatio="true">
+            <Image url="@img/player-skin/frame-colours.png" />
          </ImageView>
-         <ImageView id="anim-walk-front" fx:id="animWalkView" fitHeight="32.0" fitWidth="32.0" layoutX="362.0" layoutY="258.0" pickOnBounds="true" preserveRatio="true">
-            <image>
-               <Image url="@img/player-skin/run-front.png" />
-            </image>
+         <Rectangle fill="#f83808" height="32.0" layoutX="40.0" layoutY="42.0" onMouseClicked="#setReplacementColour" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" styleClass="colour-pane" width="32.0" />
+         <Rectangle fill="#fc862c" height="32.0" layoutX="40.0" layoutY="10.0" onMouseClicked="#setReplacementColour" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" styleClass="colour-pane" width="32.0" />
+         <Rectangle fill="#5b55f8" height="32.0" layoutX="136.0" layoutY="42.0" onMouseClicked="#setReplacementColour" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" styleClass="colour-pane" width="32.0" />
+         <Rectangle fill="#2a9e9e" height="32.0" layoutX="136.0" layoutY="10.0" onMouseClicked="#setReplacementColour" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" styleClass="colour-pane" width="32.0" />
+         <Rectangle fill="#4db932" height="32.0" layoutX="104.0" layoutY="10.0" onMouseClicked="#setReplacementColour" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" styleClass="colour-pane" width="32.0" />
+         <Rectangle fill="#dd40dd" height="32.0" layoutX="200.0" layoutY="10.0" onMouseClicked="#setReplacementColour" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" styleClass="colour-pane" width="32.0" />
+         <Rectangle fill="#b03187" height="32.0" layoutX="8.0" layoutY="10.0" onMouseClicked="#setReplacementColour" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" styleClass="colour-pane" width="32.0" />
+         <Rectangle fill="#f7cd2f" height="32.0" layoutX="72.0" layoutY="10.0" onMouseClicked="#setReplacementColour" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" styleClass="colour-pane" width="32.0" />
+         <Rectangle fill="#b27a2c" height="32.0" layoutX="72.0" layoutY="42.0" onMouseClicked="#setReplacementColour" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" styleClass="colour-pane" width="32.0" />
+         <Rectangle fill="OLIVEDRAB" height="32.0" layoutX="104.0" layoutY="42.0" onMouseClicked="#setReplacementColour" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" styleClass="colour-pane" width="32.0" />
+         <Rectangle fill="#7676d3" height="32.0" layoutX="168.0" layoutY="42.0" onMouseClicked="#setReplacementColour" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" styleClass="colour-pane" width="32.0" />
+         <Rectangle fill="#d72b64" height="32.0" layoutX="8.0" layoutY="42.0" onMouseClicked="#setReplacementColour" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" styleClass="colour-pane" width="32.0" />
+         <Rectangle fill="#9f4cd7" height="32.0" layoutX="168.0" layoutY="10.0" onMouseClicked="#setReplacementColour" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" styleClass="colour-pane" width="32.0" />
+         <Rectangle fill="#ff73c8" height="32.0" layoutX="200.0" layoutY="42.0" onMouseClicked="#setReplacementColour" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" styleClass="colour-pane" width="32.0" />
+         <ImageView fx:id="toPicker" layoutX="40.0" layoutY="42.0" pickOnBounds="true" preserveRatio="true">
+            <Image url="@img/player-skin/frame-selection.png" />
          </ImageView>
-         <ImageView id="anim-walk-left" fx:id="animWalkView1" fitHeight="32.0" fitWidth="32.0" layoutX="394.0" layoutY="258.0" pickOnBounds="true" preserveRatio="true">
-            <image>
-               <Image url="@img/player-skin/run-front.png" />
-            </image>
-         </ImageView>
-         <ImageView id="anim-walk-right" fx:id="animWalkView11" fitHeight="32.0" fitWidth="32.0" layoutX="426.0" layoutY="258.0" pickOnBounds="true" preserveRatio="true">
-            <image>
-               <Image url="@img/player-skin/run-front.png" />
-            </image>
-         </ImageView>
-         <ImageView id="anim-walk-back" fx:id="animWalkView111" fitHeight="32.0" fitWidth="32.0" layoutX="458.0" layoutY="258.0" pickOnBounds="true" preserveRatio="true">
-            <image>
-               <Image url="@img/player-skin/run-front.png" />
-            </image>
-         </ImageView>
-         <ImageView id="anim-run-front" fx:id="animWalkView2" fitHeight="32.0" fitWidth="32.0" layoutX="362.0" layoutY="359.0" pickOnBounds="true" preserveRatio="true">
-            <image>
-               <Image url="@img/player-skin/run-front.png" />
-            </image>
-         </ImageView>
-         <ImageView id="anim-run-left" fx:id="animWalkView12" fitHeight="32.0" fitWidth="32.0" layoutX="458.0" layoutY="359.0" pickOnBounds="true" preserveRatio="true">
-            <image>
-               <Image url="@img/player-skin/run-front.png" />
-            </image>
-         </ImageView>
-         <ImageView id="anim-run-right" fx:id="animWalkView112" fitHeight="32.0" fitWidth="32.0" layoutX="394.0" layoutY="359.0" pickOnBounds="true" preserveRatio="true">
-            <image>
-               <Image url="@img/player-skin/run-front.png" />
-            </image>
-         </ImageView>
-         <ImageView id="anim-run-back" fx:id="animWalkView1111" fitHeight="32.0" fitWidth="32.0" layoutX="426.0" layoutY="359.0" pickOnBounds="true" preserveRatio="true">
-            <image>
-               <Image url="@img/player-skin/run-front.png" />
-            </image>
-         </ImageView>
-         <Label layoutX="362.0" layoutY="216.0" text="%PlayerSkin.Walking">
-            <font>
-               <Font size="16.0" />
-            </font></Label>
-         <Label layoutX="362.0" layoutY="317.0" text="%PlayerSkin.Running">
-            <font>
-               <Font size="16.0" />
-            </font></Label>
-         <Group layoutX="390.0" layoutY="471.0">
-            <children>
-               <ImageView pickOnBounds="true" preserveRatio="true">
-                  <image>
-                     <Image url="@img/player-skin/frame-colours.png" />
-                  </image>
-               </ImageView>
-               <Rectangle fill="#f83808" height="32.0" layoutX="40.0" layoutY="42.0" onMouseClicked="#setReplacementColour" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="32.0" />
-               <Rectangle fill="#fc862c" height="32.0" layoutX="40.0" layoutY="10.0" onMouseClicked="#setReplacementColour" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="32.0" />
-               <Rectangle fill="#5b55f8" height="32.0" layoutX="136.0" layoutY="42.0" onMouseClicked="#setReplacementColour" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="32.0" />
-               <Rectangle fill="#2a9e9e" height="32.0" layoutX="136.0" layoutY="10.0" onMouseClicked="#setReplacementColour" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="32.0" />
-               <Rectangle fill="#4db932" height="32.0" layoutX="104.0" layoutY="10.0" onMouseClicked="#setReplacementColour" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="32.0" />
-               <Rectangle fill="#dd40dd" height="32.0" layoutX="200.0" layoutY="10.0" onMouseClicked="#setReplacementColour" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="32.0" />
-               <Rectangle fill="#b03187" height="32.0" layoutX="8.0" layoutY="10.0" onMouseClicked="#setReplacementColour" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="32.0" />
-               <Rectangle fill="#f7cd2f" height="32.0" layoutX="72.0" layoutY="10.0" onMouseClicked="#setReplacementColour" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="32.0" />
-               <Rectangle fill="#b27a2c" height="32.0" layoutX="72.0" layoutY="42.0" onMouseClicked="#setReplacementColour" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="32.0" />
-               <Rectangle fill="OLIVEDRAB" height="32.0" layoutX="104.0" layoutY="42.0" onMouseClicked="#setReplacementColour" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="32.0" />
-               <Rectangle fill="#7676d3" height="32.0" layoutX="168.0" layoutY="42.0" onMouseClicked="#setReplacementColour" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="32.0" />
-               <Rectangle fill="#d72b64" height="32.0" layoutX="8.0" layoutY="42.0" onMouseClicked="#setReplacementColour" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="32.0" />
-               <Rectangle fill="#9f4cd7" height="32.0" layoutX="168.0" layoutY="10.0" onMouseClicked="#setReplacementColour" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="32.0" />
-               <Rectangle fill="#ff73c8" height="32.0" layoutX="200.0" layoutY="42.0" onMouseClicked="#setReplacementColour" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="32.0" />
-            </children>
-         </Group>
-         <Group layoutX="72.0" layoutY="55.0" visible="false">
-            <children>
-               <Rectangle fill="#f83808" height="32.0" layoutX="64.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="32.0" />
-               <Rectangle fill="#f05030" height="32.0" layoutX="96.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="32.0" />
-               <Rectangle fill="#5048f8" height="32.0" layoutX="64.0" layoutY="32.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="32.0" />
-               <Rectangle fill="AQUA" height="32.0" layoutX="32.0" layoutY="32.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="32.0" />
-               <Rectangle fill="#38b818" height="32.0" layoutY="32.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="32.0" />
-               <Rectangle fill="MAGENTA" height="32.0" layoutX="160.0" layoutY="32.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="32.0" />
-               <Rectangle fill="#b03060" height="32.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="32.0" />
-               <Rectangle fill="YELLOW" height="32.0" layoutX="128.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="32.0" />
-               <Rectangle fill="#785018" height="32.0" layoutX="160.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="32.0" />
-               <Rectangle fill="OLIVEDRAB" height="32.0" layoutX="192.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="32.0" />
-               <Rectangle fill="#8080ff" height="32.0" layoutX="96.0" layoutY="32.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="32.0" />
-               <Rectangle fill="RED" height="32.0" layoutX="32.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="32.0" />
-               <Rectangle fill="#a020f0" height="32.0" layoutX="128.0" layoutY="32.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="32.0" />
-               <Rectangle fill="#ff73c8" height="32.0" layoutX="192.0" layoutY="32.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" width="32.0" />
-            </children>
-         </Group>
-      </children></AnchorPane>
+      </Group>
+      <ImageView id="sitting-front-2" fitHeight="32.0" fitWidth="32.0" layoutX="497.0" layoutY="116.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@img/player-skin/run-front.png" />
+         </image>
+      </ImageView>
+      <ImageView id="sitting-back-2" fitHeight="32.0" fitWidth="32.0" layoutX="529.0" layoutY="116.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@img/player-skin/run-front.png" />
+         </image>
+      </ImageView>
+      <ImageView id="sitting-side-2" fitHeight="32.0" fitWidth="32.0" layoutX="561.0" layoutY="116.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@img/player-skin/run-front.png" />
+         </image>
+      </ImageView>
+      <ImageView id="fishing-front-2" fitWidth="32.0" layoutX="297.0" layoutY="317.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@img/player-skin/fishing-front.png" />
+         </image>
+      </ImageView>
+      <ImageView id="fishing-back-2" fitWidth="32.0" layoutX="329.0" layoutY="317.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@img/player-skin/fishing-back.png" />
+         </image>
+      </ImageView>
+      <ImageView id="fishing-side-2" fitHeight="32.0" layoutX="361.0" layoutY="333.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@img/player-skin/fishing-side.png" />
+         </image>
+      </ImageView>
+      <Label layoutX="497.0" layoutY="74.0" text="%PlayerSkin.Sitting">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </Label>
+      <Label layoutX="297.0" layoutY="275.0" text="%PlayerSkin.Fishing">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </Label>
+      <Label layoutX="497.0" layoutY="174.0" text="%PlayerSkin.Sleeping">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </Label>
+      <ImageView id="sleeping-2" fitHeight="32.0" layoutX="497.0" layoutY="216.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@img/player-skin/sleeping.png" />
+         </image>
+      </ImageView>
+      <Label layoutX="689.0" layoutY="74.0" text="%PlayerSkin.Front">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </Label>
+      <Label layoutX="689.0" layoutY="242.0" text="%PlayerSkin.Back">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </Label>
+      <ImageView id="front-2" fitWidth="112.0" layoutX="689.0" layoutY="112.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@img/player-skin/front.png" />
+         </image>
+      </ImageView>
+      <ImageView id="back-2" fitWidth="96.0" layoutX="689.0" layoutY="284.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@img/player-skin/back.png" />
+         </image>
+      </ImageView>
+      <Label layoutX="561.0" layoutY="414.0" text="%PlayerSkin.ReplacementColour">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </Label>
+      <Label layoutX="283.0" layoutY="414.0" text="%PlayerSkin.ColourToReplace">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </Label>
+      <Label alignment="CENTER" contentDisplay="CENTER" layoutX="134.0" layoutY="546.0" prefHeight="72.0" prefWidth="816.0" text="%PlayerSkin.ColourExplanation" textAlignment="CENTER">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </Label>
+      <ImageView id="pane-2" fx:id="originPane" layoutX="283.0" layoutY="447.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@img/player-skin/frame-colours.png" />
+         </image>
+      </ImageView>
+      <Group fx:id="colourGroup">
+         <children>
+            <ImageView fx:id="fromPicker" pickOnBounds="true" preserveRatio="true" visible="false">
+               <image>
+                  <Image url="@img/player-skin/frame-selection.png" />
+               </image>
+            </ImageView>
+         </children>
+      </Group>
+   </AnchorPane>
 </AnchorPane>

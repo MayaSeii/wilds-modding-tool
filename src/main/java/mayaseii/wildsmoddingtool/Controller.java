@@ -67,6 +67,7 @@ public class Controller
 
         // Shows the stage.
         stage.setScene(scene);
+        stage.centerOnScreen();
         stage.show();
     }
 }

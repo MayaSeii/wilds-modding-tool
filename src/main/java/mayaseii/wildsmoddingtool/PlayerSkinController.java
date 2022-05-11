@@ -6,10 +6,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.scene.SnapshotParameters;
+import javafx.scene.*;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.*;
@@ -59,7 +56,10 @@ public class PlayerSkinController implements Initializable
     @FXML private ImageView sleepingView;
     @FXML private ImageView frontView;
     @FXML private ImageView backView;
-
+    @FXML private ImageView toPicker;
+    @FXML private ImageView fromPicker;
+    @FXML private ImageView originPane;
+    @FXML private Group colourGroup;
     private ResourceBundle _bundle;
 
     private static java.awt.Color _toColour = new java.awt.Color(248, 56, 8);
@@ -100,7 +100,7 @@ public class PlayerSkinController implements Initializable
     {
         SplitPane.Divider divider = splitPane.getDividers().get(0);
         double position = divider.getPosition();
-        divider.positionProperty().addListener((observable, oldvalue, newvalue) -> divider.setPosition(position));
+        divider.positionProperty().addListener((observable, oldValue, newValue) -> divider.setPosition(position));
     }
 
     private void resizeUsingNearestNeighbour(@NotNull AnchorPane pane)
@@ -475,6 +475,7 @@ public class PlayerSkinController implements Initializable
     {
         createPreviewGIFs();
         loadGIFsIntoViews();
+        loadPNGViews();
 
         Map<Integer, Integer> colourMap = getSpriteColourMap();
         createPalettePanel(colourMap);
@@ -482,10 +483,27 @@ public class PlayerSkinController implements Initializable
         previewPane.setVisible(true);
     }
 
+    private void loadPNGViews()
+    {
+        for (Node node : previewPane.getChildren())
+        {
+            if (node instanceof ImageView view && view.getId() != null && view.getId().contains("-2") && !view.getId().contains("pane"))
+            {
+                String url = "img/player-skin/" + view.getId().replace("-2", "") + ".png";
+                Image image = new Image(Objects.requireNonNull(getClass().getResource(url)).toExternalForm(), view.getFitWidth(), view.getFitHeight(), true, false);
+                view.setImage(image);
+            }
+        }
+    }
+
     private void createPalettePanel(@NotNull Map<Integer, Integer> colourMap)
     {
-        // TODO: temporary.
-        int y = 60;
+        int x = (int) originPane.getLayoutX() + 8;
+        int y = (int) originPane.getLayoutY() + 10;
+
+        int i = 0;
+
+        boolean switchY = true;
 
         for (Integer colour : colourMap.keySet())
         {
@@ -493,8 +511,10 @@ public class PlayerSkinController implements Initializable
 
             palettePane.setWidth(32);
             palettePane.setHeight(32);
-            palettePane.setLayoutX(200);
+            palettePane.setLayoutX(x);
             palettePane.setLayoutY(y);
+
+            palettePane.getStyleClass().add("colour-pane");
 
             Color newColor = Color.valueOf(String.format("#%06X", (0xFFFFFF & colour)));
             palettePane.setFill(newColor);
@@ -503,10 +523,53 @@ public class PlayerSkinController implements Initializable
             EventHandler<MouseEvent> eventHandler = this::palettePanelClicked;
             palettePane.addEventHandler(MouseEvent.MOUSE_CLICKED, eventHandler);
 
-            previewPane.getChildren().add(palettePane);
+            colourGroup.getChildren().add(palettePane);
 
-            // TODO: temporary.
-            y += 45;
+            if (switchY)
+            {
+                y += 32;
+                switchY = false;
+            }
+            else
+            {
+                y -= 32;
+                x += 32;
+                switchY = true;
+            }
+
+            i++;
+            if (i >= 14) break;
+        }
+
+        for (int j = i; j < 14; j++)
+        {
+            Rectangle palettePane = new Rectangle();
+
+            palettePane.setWidth(32);
+            palettePane.setHeight(32);
+            palettePane.setLayoutX(x);
+            palettePane.setLayoutY(y);
+
+            palettePane.getStyleClass().add("colour-pane");
+            palettePane.setFill(Color.BLACK);
+
+            // Adds the mouse click event handler.
+            EventHandler<MouseEvent> eventHandler = this::palettePanelClicked;
+            palettePane.addEventHandler(MouseEvent.MOUSE_CLICKED, eventHandler);
+
+            colourGroup.getChildren().add(palettePane);
+
+            if (switchY)
+            {
+                y += 32;
+                switchY = false;
+            }
+            else
+            {
+                y -= 32;
+                x += 32;
+                switchY = true;
+            }
         }
     }
 
@@ -514,7 +577,7 @@ public class PlayerSkinController implements Initializable
     {
         for (Node node : previewPane.getChildren())
         {
-            if (node instanceof ImageView view && view.getId() != null)
+            if (node instanceof ImageView view && view.getId() != null && !view.getId().contains("-2"))
             {
                 Image image = new Image(new File(view.getId() + ".gif").toURI().toString());
                 view.setImage(image);
@@ -618,6 +681,15 @@ public class PlayerSkinController implements Initializable
         Rectangle button = (Rectangle) e.getSource();
         _fromColour = fxToAWTColor((Color) button.getFill());
 
+        if (!fromPicker.isVisible())
+        {
+            fromPicker.setVisible(true);
+            fromPicker.toFront();
+        }
+
+        fromPicker.setLayoutX(button.getLayoutX());
+        fromPicker.setLayoutY(button.getLayoutY());
+
         changeColour();
     }
 
@@ -627,6 +699,7 @@ public class PlayerSkinController implements Initializable
 
         try
         {
+            changePNGPaneColour();
             createPreviewGIFs();
             loadGIFsIntoViews();
         }
@@ -637,6 +710,17 @@ public class PlayerSkinController implements Initializable
         finally
         {
             revertTemporaryChanges(originalImages);
+        }
+    }
+
+    private void changePNGPaneColour()
+    {
+        for (Node node : previewPane.getChildren())
+        {
+            if (node instanceof ImageView view && view.getId() != null && view.getId().contains("-2") && !view.getId().contains("pane"))
+            {
+                view.setImage(((ImageView) rightPane.lookup("#" + view.getId().replace("-2", ""))).getImage());
+            }
         }
     }
 
@@ -678,6 +762,9 @@ public class PlayerSkinController implements Initializable
     {
         Rectangle colourRect = (Rectangle) e.getSource();
         Color fxColour = (Color) colourRect.getFill();
+
+        toPicker.setLayoutX(colourRect.getLayoutX());
+        toPicker.setLayoutY(colourRect.getLayoutY());
 
         _toColour = new java.awt.Color((float) fxColour.getRed(), (float) fxColour.getGreen(), (float) fxColour.getBlue(), (float) fxColour.getOpacity());
 

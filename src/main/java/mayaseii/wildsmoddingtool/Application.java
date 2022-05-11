@@ -32,7 +32,7 @@ public class Application extends javafx.application.Application
         ResourceBundle bundle = ResourceBundle.getBundle("mayaseii.wildsmoddingtool.strings", locale);
 
         // Loads the custom Pokémon font.
-        Font.loadFont(Objects.requireNonNull(getClass().getResource("PokeWilds-Regular.ttf")).toExternalForm(), 16);
+        Font.loadFont(Objects.requireNonNull(getClass().getResource("PokeWilds-Regular.ttf")).toExternalForm().replace("%20", " "), 16);
 
         // Loads the scene from the FXML file.
         FXMLLoader fxmlLoader = new FXMLLoader(Application.class.getResource("main-menu.fxml"), bundle);
