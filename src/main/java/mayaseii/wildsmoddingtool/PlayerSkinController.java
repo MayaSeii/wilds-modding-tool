@@ -62,7 +62,8 @@ public class PlayerSkinController implements Initializable
 
     private ResourceBundle _bundle;
 
-    private static java.awt.Color _replacementColour;
+    private static java.awt.Color _toColour = new java.awt.Color(248, 56, 8);
+    private static java.awt.Color _fromColour;
 
     public void initialize(URL location, @NotNull ResourceBundle bundle)
     {
@@ -496,7 +497,7 @@ public class PlayerSkinController implements Initializable
             palettePane.setFill(newColor);
 
             // Adds the mouse click event handler.
-            EventHandler<MouseEvent> eventHandler = this::changeColour;
+            EventHandler<MouseEvent> eventHandler = this::palettePanelClicked;
             palettePane.addEventHandler(MouseEvent.MOUSE_CLICKED, eventHandler);
 
             previewPane.getChildren().add(palettePane);
@@ -607,14 +608,17 @@ public class PlayerSkinController implements Initializable
         return op.filter(img, null);
     }
 
-    public void changeColour(@NotNull MouseEvent e)
+    public void palettePanelClicked(@NotNull MouseEvent e)
     {
         Rectangle button = (Rectangle) e.getSource();
+        _fromColour = fxToAWTColor((Color) button.getFill());
 
-        java.awt.Color from = fxToAWTColor((Color) button.getFill());
-        java.awt.Color to = _replacementColour;
+        changeColour();
+    }
 
-        changeTemporaryPaneColour(from, to);
+    private void changeColour()
+    {
+        ArrayList<Image> originalImages = changeTemporaryPaneColour(_fromColour, _toColour);
 
         try
         {
@@ -627,23 +631,40 @@ public class PlayerSkinController implements Initializable
         }
         finally
         {
-            changeTemporaryPaneColour(to, from);
+            revertTemporaryChanges(originalImages);
         }
     }
 
-    private void changeTemporaryPaneColour(java.awt.Color from, java.awt.Color to)
+    private @NotNull ArrayList<Image> changeTemporaryPaneColour(java.awt.Color from, java.awt.Color to)
+    {
+        ArrayList<Image> oldImageList = new ArrayList<>();
+
+        for (Node node : rightPane.getChildren())
+        {
+            if (node instanceof ImageView view && view.getId() != null)
+            {
+                Image oldImage = view.getImage();
+                oldImageList.add(oldImage);
+
+                BufferedImage bufferedImage = SwingFXUtils.fromFXImage(oldImage, null);
+                BufferedImageOp lookup = new LookupOp(new ColorMapper(from, to), null);
+                BufferedImage convertedImage = lookup.filter(bufferedImage, null);
+
+                view.setImage(SwingFXUtils.toFXImage(convertedImage, null));
+            }
+        }
+
+        return oldImageList;
+    }
+
+    private void revertTemporaryChanges(ArrayList<Image> originalImages)
     {
         for (Node node : rightPane.getChildren())
         {
             if (node instanceof ImageView view && view.getId() != null)
             {
-                Image newImage = view.getImage();
-
-                BufferedImage bufferedImage = SwingFXUtils.fromFXImage(newImage, null);
-                BufferedImageOp lookup = new LookupOp(new ColorMapper(from, to), null);
-                BufferedImage convertedImage = lookup.filter(bufferedImage, null);
-
-                view.setImage(SwingFXUtils.toFXImage(convertedImage, null));
+                view.setImage(originalImages.get(0));
+                originalImages.remove(0);
             }
         }
     }
@@ -653,7 +674,10 @@ public class PlayerSkinController implements Initializable
         Rectangle colourRect = (Rectangle) e.getSource();
         Color fxColour = (Color) colourRect.getFill();
 
-        _replacementColour = new java.awt.Color((float) fxColour.getRed(), (float) fxColour.getGreen(), (float) fxColour.getBlue(), (float) fxColour.getOpacity());
+        _toColour = new java.awt.Color((float) fxColour.getRed(), (float) fxColour.getGreen(), (float) fxColour.getBlue(), (float) fxColour.getOpacity());
+
+        if (_fromColour == null) return;
+        changeColour();
     }
 
     public void hidePreviewPane()
