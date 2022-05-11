@@ -484,14 +484,17 @@ public class PlayerSkinController implements Initializable
 
     private void createPalettePanel(@NotNull Map<Integer, Integer> colourMap)
     {
+        // TODO: temporary.
+        int y = 60;
+
         for (Integer colour : colourMap.keySet())
         {
             Rectangle palettePane = new Rectangle();
 
             palettePane.setWidth(32);
             palettePane.setHeight(32);
-            palettePane.setLayoutX(new Random().nextInt(1000));
-            palettePane.setLayoutY(new Random().nextInt(600));
+            palettePane.setLayoutX(200);
+            palettePane.setLayoutY(y);
 
             Color newColor = Color.valueOf(String.format("#%06X", (0xFFFFFF & colour)));
             palettePane.setFill(newColor);
@@ -502,6 +505,8 @@ public class PlayerSkinController implements Initializable
 
             previewPane.getChildren().add(palettePane);
 
+            // TODO: temporary.
+            y += 45;
         }
     }
 
