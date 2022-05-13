@@ -469,6 +469,7 @@ public class PlayerSkinController implements Initializable
         BufferedImage concatImage = new BufferedImage(widthTotal, imageSet[0].getHeight(), BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2d = concatImage.createGraphics();
 
+        // Adds the images together.
         for (BufferedImage image : imageSet)
         {
             g2d.drawImage(image, widthCurr, concatImage.getHeight() - image.getHeight(), null);
