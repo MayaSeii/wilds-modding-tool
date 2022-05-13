@@ -564,6 +564,7 @@ public class PlayerSkinController implements Initializable
             palettePane.setLayoutX(x);
             palettePane.setLayoutY(y);
 
+            // Default panes.
             palettePane.getStyleClass().add("colour-pane");
             palettePane.setFill(Color.BLACK);
 
