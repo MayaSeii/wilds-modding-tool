@@ -609,7 +609,11 @@ public class PlayerSkinController implements Initializable
         {
             if (node instanceof ImageView view && view.getId() != null && !view.getId().contains("-2"))
             {
-                Image image = new Image(new File(view.getId() + ".gif").toURI().toString());
+                File imageFile = new File(view.getId() + ".gif");
+                Image image = new Image(imageFile.toURI().toString());
+
+                if (!imageFile.delete()) System.out.println("Couldn't delete file.");
+
                 view.setImage(image);
             }
         }
