@@ -28,7 +28,8 @@ public class Application extends javafx.application.Application
     public void start(@NotNull Stage stage) throws IOException
     {
         // Resolves the locale.
-        locale = new Locale("en");
+        locale = new Locale("es");
+        // locale = Locale.getDefault();
         ResourceBundle bundle = ResourceBundle.getBundle("mayaseii.wildsmoddingtool.strings", locale);
 
         // Loads the custom Pokémon font.

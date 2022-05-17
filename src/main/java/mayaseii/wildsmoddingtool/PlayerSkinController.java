@@ -324,6 +324,20 @@ public class PlayerSkinController implements Initializable
 
     public void downloadMod() throws IOException
     {
+        String charName = nameField.getText().trim();
+        String authorName = authorField.getText().trim();
+
+        if (charName.isBlank())
+        {
+            displayInfoPopup(String.format(_bundle.getString("PlayerSkin.MustNotBeEmpty"), _bundle.getString("PlayerSkin.CharacterName").toLowerCase()));
+            return;
+        }
+        else if (authorName.isBlank())
+        {
+            displayInfoPopup(String.format(_bundle.getString("PlayerSkin.MustNotBeEmpty"), _bundle.getString("PlayerSkin.ModAuthor").toLowerCase()));
+            return;
+        }
+
         BufferedImage[] wSprites = new BufferedImage[8];
         BufferedImage[] rSprites = new BufferedImage[8];
         BufferedImage[] sSprites = new BufferedImage[3];
@@ -723,8 +737,6 @@ public class PlayerSkinController implements Initializable
 
     private void removeFromSelectedColours(@NotNull MouseEvent e)
     {
-        System.out.println("TEST");
-
         ImageView view = (ImageView) e.getSource();
         int code = Integer.parseInt(view.getId());
         java.awt.Color toRemove = new java.awt.Color(code);
